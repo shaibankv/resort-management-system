@@ -1,0 +1,162 @@
+{% extends 'resort/base.html' %}
+
+{% block content %}
+<div class="row justify-content-center mb-5">
+    <div class="col-md-9">
+        <div class="card shadow" id="bill-card">
+            <div class="card-header bg-white text-center border-bottom-0 pt-4 pb-0">
+                <h2 class="mb-1 text-success font-weight-bold">🌿 Whispering Willows</h2>
+                <p class="text-muted mb-3">Resort Management & Billing</p>
+                <div class="border-top pt-3"></div>
+            </div>
+            <div class="card-body px-5 pt-0">
+                <h4 class="text-center mb-4 font-weight-bold text-uppercase tracking-wider">Final Invoice</h4>
+                
+                <div class="row mb-4 bg-light p-3 rounded">
+                    <div class="col-sm-6">
+                        <h6 class="mb-1 text-secondary text-uppercase text-xs font-weight-bold">Billed To:</h6>
+                        <div class="fs-5 font-weight-bold text-dark">{{ guest.name }}</div>
+                        <div class="text-muted">Phone: {{ guest.phone_number }}</div>
+                        <div class="text-muted small mt-1">Guests: {{ guest.number_of_adults }} Adults, {{ guest.number_of_children }} Children</div>
+                    </div>
+                    <div class="col-sm-6 text-sm-end mt-3 mt-sm-0">
+                        <h6 class="mb-1 text-secondary text-uppercase text-xs font-weight-bold">Invoice Details:</h6>
+                        <div class="text-dark"><strong>Check-in:</strong> {{ guest.check_in_date }}</div>
+                        <div class="text-dark"><strong>Check-out:</strong> {{ guest.check_out_date }}</div>
+                        <div class="text-dark"><strong>Booking Mode:</strong> {{ guest.mode_of_booking }}</div>
+                    </div>
+                </div>
+
+                <div class="table-responsive-sm mb-4">
+                    <table class="table table-bordered table-striped align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th class="text-center" style="width: 5%">#</th>
+                                <th>Description</th>
+                                <th class="text-end" style="width: 20%">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="text-center">1</td>
+                                <td>
+                                    <strong>Room Charges</strong>
+                                    {% if guest.bookedroom_set.all %}
+                                        <ul class="mb-0 small text-muted mt-1 ps-3">
+                                        {% for room in guest.bookedroom_set.all %}
+                                            <li>Room {{ room.room_number }} ({{ room.room_type }}) @ ₹{{ room.rate_per_day }}/day</li>
+                                        {% endfor %}
+                                        </ul>
+                                    {% else %}
+                                        <div class="small text-muted mt-1">No rooms recorded.</div>
+                                    {% endif %}
+
+                                    {% if guest.extra_bed_needed %}
+                                    <div class="small text-muted mt-1 fw-bold">Extra bed: ₹{{ guest.extra_bed_rate }}/day</div>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end fw-bold">₹{{ guest.total_room_bill }}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">2</td>
+                                <td>
+                                    <strong>Food & Beverages</strong>
+                                    {% if guest.foodcharge_set.all %}
+                                    <ul class="mb-0 small text-muted mt-1 ps-3">
+                                        {% for fc in guest.foodcharge_set.all %}
+                                        <li>{{ fc.quantity }}x {{ fc.item_name }} (@₹{{ fc.rate_per_unit }}) = <strong>₹{{ fc.total_amount }}</strong></li>
+                                        {% endfor %}
+                                    </ul>
+                                    {% else %}
+                                    <div class="small text-muted mt-1">No food items ordered.</div>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end fw-bold">₹{{ guest.total_food_bill }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="row mt-4">
+                    <div class="col-lg-5 col-sm-6 ms-auto">
+                        <table class="table table-clear border">
+                            <tbody>
+                                <tr>
+                                    <td class="text-start"><strong>Subtotal</strong></td>
+                                    <td class="text-end">₹{{ guest.total_bill }}</td>
+                                </tr>
+                                <tr class="bg-success text-white">
+                                    <td class="text-start fs-5"><strong>Total Amount</strong></td>
+                                    <td class="text-end fs-5"><strong>₹{{ guest.total_bill }}</strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Manager Signature Section -->
+                <div class="row mt-5 pt-5 pb-2">
+                    <div class="col-6 text-center">
+                        <div class="border-top border-dark w-75 mx-auto pt-2">
+                            <strong>Guest Signature</strong>
+                        </div>
+                    </div>
+                    <div class="col-6 text-center">
+                        <div class="border-top border-dark w-75 mx-auto pt-2">
+                            <strong>Manager Signature</strong>
+                            <div class="small text-muted mt-1">Whispering Willows Resort</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-light text-center py-3 border-top-0 rounded-bottom">
+                <p class="mb-0 font-italic">Thank you for staying at Whispering Willows! We hope to see you again.</p>
+            </div>
+        </div>
+        
+        <div class="text-center mt-4 d-print-none">
+            <button class="btn btn-primary btn-lg me-2 px-4 shadow-sm" onclick="window.print()">
+                <i class="bi bi-printer"></i> Print Invoice
+            </button>
+            <a href="{% url 'home' %}" class="btn btn-secondary btn-lg px-4 shadow-sm">Back to Dashboard</a>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* CSS for A4 Size and Narrow Margins when Printing */
+    @page {
+        size: A4;
+        margin: 10mm; /* Narrow margins (~0.4 inches) */
+    }
+    
+    @media print {
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: white;
+        }
+        body * {
+            visibility: hidden;
+        }
+        #bill-card, #bill-card * {
+            visibility: visible;
+        }
+        #bill-card {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            border: none !important;
+            box-shadow: none !important;
+        }
+        .d-print-none {
+            display: none !important;
+        }
+        .card-header, .card-footer {
+            background-color: white !important;
+        }
+    }
+    .tracking-wider { letter-spacing: 2px; }
+</style>
+{% endblock %}

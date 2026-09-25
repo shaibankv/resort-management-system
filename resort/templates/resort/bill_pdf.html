@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    body { font-family: Helvetica, Arial, sans-serif; }
+    h2 { color: #198754; text-align: center; margin-bottom: 5px; }
+    .text-center { text-align: center; }
+    .text-muted { color: #6c757d; }
+    .mb-3 { margin-bottom: 1rem; }
+    .mt-4 { margin-top: 1.5rem; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #dee2e6; padding: 8px; text-align: left; }
+    th { background-color: #343a40; color: white; }
+    .text-end { text-align: right; }
+    .bg-success { background-color: #198754; color: white; }
+</style>
+</head>
+<body>
+    <h2>Whispering Willows</h2>
+    <p class="text-center text-muted">Resort Management & Billing</p>
+    <hr/>
+    <h3 class="text-center">Final Invoice</h3>
+    
+    <div>
+        <strong>Billed To:</strong> {{ guest.name }} <br/>
+        <strong>Phone:</strong> {{ guest.phone_number }} <br/>
+        <strong>Check-in:</strong> {{ guest.check_in_date }} <br/>
+        <strong>Check-out:</strong> {{ guest.check_out_date }} <br/>
+        <strong>Guests:</strong> {{ guest.number_of_adults }} Adults, {{ guest.number_of_children }} Children
+    </div>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Description</th>
+                <th class="text-end">Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <strong>Room Charges</strong>
+                    {% for room in guest.bookedroom_set.all %}
+                        <br/> - Room {{ room.room_number }} ({{ room.room_type }}) @ Rs. {{ room.rate_per_day }}/day
+                    {% endfor %}
+                    {% if guest.extra_bed_needed %}
+                        <br/> - Extra bed: Rs. {{ guest.extra_bed_rate }}/day
+                    {% endif %}
+                </td>
+                <td class="text-end">Rs. {{ guest.total_room_bill }}</td>
+            </tr>
+            <tr>
+                <td>
+                    <strong>Food & Beverages</strong>
+                    {% for fc in guest.foodcharge_set.all %}
+                        <br/> - {{ fc.quantity }}x {{ fc.item_name }} (@Rs. {{ fc.rate_per_unit }})
+                    {% endfor %}
+                </td>
+                <td class="text-end">Rs. {{ guest.total_food_bill }}</td>
+            </tr>
+            <tr>
+                <td><strong>Subtotal</strong></td>
+                <td class="text-end">Rs. {{ guest.total_bill }}</td>
+            </tr>
+            <tr class="bg-success">
+                <td><strong>Total Amount</strong></td>
+                <td class="text-end"><strong>Rs. {{ guest.total_bill }}</strong></td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>

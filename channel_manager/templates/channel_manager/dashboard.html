@@ -1,0 +1,61 @@
+{% extends 'resort/base.html' %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2 class="text-primary">Channel Manager Dashboard</h2>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 border-start border-primary border-5 h-100">
+            <div class="card-body">
+                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Physical Rooms</div>
+                <div class="h2 mb-0 font-weight-bold text-gray-800">{{ total_rooms }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 border-start border-info border-5 h-100">
+            <div class="card-body">
+                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Reservations Today</div>
+                <div class="h2 mb-0 font-weight-bold text-gray-800">{{ reservations_today }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 border-start border-warning border-5 h-100">
+            <div class="card-body">
+                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Connected Channels</div>
+                <div class="h2 mb-0 font-weight-bold text-gray-800">
+                    {{ channels|length }}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 border-start border-danger border-5 h-100">
+            <div class="card-body">
+                <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Failed Syncs</div>
+                <div class="h2 mb-0 font-weight-bold text-gray-800">{{ failed_syncs }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white font-weight-bold">Channel Manager Actions</div>
+            <div class="card-body d-grid gap-3">
+                <a href="{% url 'channel_manager:create_reservation' %}" class="btn btn-outline-primary btn-lg">New Central Reservation</a>
+                <a href="{% url 'channel_manager:reservations' %}" class="btn btn-outline-info btn-lg">View All Reservations</a>
+                <a href="{% url 'channel_manager:calendar' %}" class="btn btn-outline-success btn-lg">Availability Calendar</a>
+                <a href="{% url 'channel_manager:channels' %}" class="btn btn-outline-warning btn-lg">Manage Channels</a>
+                <a href="{% url 'channel_manager:logs' %}" class="btn btn-outline-danger btn-lg">Sync Logs</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

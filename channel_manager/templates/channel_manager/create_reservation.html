@@ -1,0 +1,62 @@
+{% extends 'resort/base.html' %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2>Create Reservation (Offline)</h2>
+    </div>
+</div>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+{% endif %}
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <form method="post" action="{% url 'channel_manager:create_reservation' %}">
+            {% csrf_token %}
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Guest Name</label>
+                    <input type="text" name="guest_name" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Guest Phone</label>
+                    <input type="text" name="guest_phone" class="form-control" required>
+                </div>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Check In Date</label>
+                    <input type="date" name="check_in" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Check Out Date</label>
+                    <input type="date" name="check_out" class="form-control" required>
+                </div>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Room Type</label>
+                    <select name="room_type" class="form-select" required>
+                        {% for rt in room_types %}
+                            <option value="{{ rt.id }}">{{ rt.name }} (Base Rate: ₹{{ rt.base_price }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Number of Rooms</label>
+                    <input type="number" name="num_rooms" class="form-control" value="1" min="1" required>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Create Reservation & Sync</button>
+            <a href="{% url 'channel_manager:reservations' %}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

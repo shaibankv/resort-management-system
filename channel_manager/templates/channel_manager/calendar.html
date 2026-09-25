@@ -1,0 +1,44 @@
+{% extends 'resort/base.html' %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2>Availability Calendar</h2>
+        <form method="get" class="d-flex w-50 mt-3">
+            <input type="date" name="start_date" class="form-control me-2" value="{{ start_date }}">
+            <button type="submit" class="btn btn-primary">View Dates</button>
+        </form>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body overflow-auto">
+        <table class="table table-bordered text-center">
+            <thead class="table-light">
+                <tr>
+                    <th class="text-start">Room Type</th>
+                    {% for d in dates %}
+                        <th>{{ d|date:"M d" }}<br><small>{{ d|date:"D" }}</small></th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in calendar_data %}
+                <tr>
+                    <th class="text-start">{{ row.room_type }}</th>
+                    {% for avail in row.availability %}
+                        <td class="{% if avail > 0 %}bg-success text-white{% else %}bg-danger text-white{% endif %}">
+                            {{ avail }}
+                        </td>
+                    {% endfor %}
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="15">No room types configured.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

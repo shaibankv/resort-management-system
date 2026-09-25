@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    body { font-family: Helvetica, Arial, sans-serif; }
+    h2 { color: #2c3e50; text-align: center; margin-bottom: 5px; }
+    .text-center { text-align: center; }
+    .text-muted { color: #6c757d; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #dee2e6; padding: 8px; text-align: left; }
+    th { background-color: #343a40; color: white; }
+    .text-end { text-align: right; }
+    .bg-light { background-color: #f8f9fa; }
+</style>
+</head>
+<body>
+    <h2>Whispering Willows</h2>
+    <p class="text-center text-muted">Revenue & Visited Guests Report</p>
+    <hr/>
+    <div>
+        <strong>Period:</strong> {{ start_date|default:'Beginning' }} to {{ end_date|default:'Present' }} <br/>
+        <strong>Booking Mode:</strong> {{ mode|default:'All Modes' }} <br/>
+        <strong>Total Revenue:</strong> Rs. {{ total_revenue }} <br/>
+        <strong>Total Room Revenue:</strong> Rs. {{ total_room_revenue }} <br/>
+        <strong>Total Food Revenue:</strong> Rs. {{ total_food_revenue }}
+    </div>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Guest Name</th>
+                <th>Phone</th>
+                <th>Check-in</th>
+                <th>Check-out</th>
+                <th class="text-end">Total Bill</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for g in guests %}
+            <tr>
+                <td>{{ g.name }}</td>
+                <td>{{ g.phone_number }}</td>
+                <td>{{ g.check_in_date }}</td>
+                <td>{{ g.check_out_date }}</td>
+                <td class="text-end">Rs. {{ g.total_bill }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

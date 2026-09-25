@@ -1,0 +1,128 @@
+{% extends 'resort/base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0 border-top border-success border-3">
+            <div class="card-header bg-white text-success pb-0 border-0">
+                <h4 class="mb-2 mt-2">Add Food Items</h4>
+            </div>
+            <div class="card-body">
+                <h6 class="card-subtitle mb-4 text-muted border-bottom pb-2">Guest: {{ guest.name }}</h6>
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div id="food_items_container">
+                        <!-- Initial Row -->
+                        <div class="row g-2 mb-2 align-items-end food-row">
+                            <div class="col-md-4">
+                                <label class="form-label small text-muted mb-1">Item Name</label>
+                                <input type="text" name="item_name[]" class="form-control form-control-sm" placeholder="e.g. Breakfast, Burger..." required>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label small text-muted mb-1">Qty</label>
+                                <input type="number" name="quantity[]" class="form-control form-control-sm qty-input" min="1" value="1" required>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label small text-muted mb-1">Rate (₹)</label>
+                                <input type="number" step="0.01" name="rate_per_unit[]" class="form-control form-control-sm rate-input" value="0.00" required>
+                            </div>
+                            <div class="col-md-2 text-center pb-1">
+                                <small class="text-muted">Total: <span class="item-total fw-bold">₹0.00</span></small>
+                            </div>
+                            <div class="col-md-2">
+                                <button type="button" class="btn btn-sm btn-outline-danger w-100 remove-row" disabled>Remove</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4 mt-2">
+                        <button type="button" class="btn btn-sm btn-outline-primary" id="add_item_btn">
+                            + Add Another Item
+                        </button>
+                    </div>
+
+                    <div class="alert alert-success d-flex justify-content-between align-items-center mb-4">
+                        <span class="fw-bold">Total Amount:</span>
+                        <span class="fs-4 fw-bold" id="total_amount_display">₹0.00</span>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="{% url 'active_guests' %}" class="btn btn-light">Cancel</a>
+                        <button type="submit" class="btn btn-success px-4">Save All Charges</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var container = document.getElementById("food_items_container");
+        var addBtn = document.getElementById("add_item_btn");
+        var totalDisplay = document.getElementById("total_amount_display");
+
+        function calculateTotal() {
+            var total = 0;
+            var rows = container.querySelectorAll(".food-row");
+            rows.forEach(function(row) {
+                var qty = parseFloat(row.querySelector(".qty-input").value) || 0;
+                var rate = parseFloat(row.querySelector(".rate-input").value) || 0;
+                var itemTotal = qty * rate;
+                
+                row.querySelector(".item-total").textContent = "₹" + itemTotal.toFixed(2);
+                
+                total += itemTotal;
+            });
+            totalDisplay.textContent = "₹" + total.toFixed(2);
+        }
+
+        function updateRemoveButtons() {
+            var rows = container.querySelectorAll(".food-row");
+            rows.forEach(function(row, index) {
+                var removeBtn = row.querySelector(".remove-row");
+                if (rows.length === 1) {
+                    removeBtn.disabled = true;
+                } else {
+                    removeBtn.disabled = false;
+                }
+            });
+        }
+
+        function attachEvents(row) {
+            row.querySelector(".qty-input").addEventListener("input", calculateTotal);
+            row.querySelector(".rate-input").addEventListener("input", calculateTotal);
+            row.querySelector(".remove-row").addEventListener("click", function() {
+                var rows = container.querySelectorAll(".food-row");
+                if (rows.length > 1) {
+                    row.remove();
+                    calculateTotal();
+                    updateRemoveButtons();
+                }
+            });
+        }
+
+        // Attach events to initial row
+        attachEvents(container.querySelector(".food-row"));
+        updateRemoveButtons();
+
+        addBtn.addEventListener("click", function() {
+            var firstRow = container.querySelector(".food-row");
+            var newRow = firstRow.cloneNode(true);
+            
+            // Clear inputs
+            newRow.querySelector('input[name="item_name[]"]').value = "";
+            newRow.querySelector('input[name="quantity[]"]').value = "1";
+            newRow.querySelector('input[name="rate_per_unit[]"]').value = "0.00";
+            
+            container.appendChild(newRow);
+            attachEvents(newRow);
+            updateRemoveButtons();
+            calculateTotal();
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    body { font-family: Helvetica, Arial, sans-serif; }
+    h2 { color: #dc3545; text-align: center; margin-bottom: 5px; }
+    .text-center { text-align: center; }
+    .text-muted { color: #6c757d; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #dee2e6; padding: 8px; text-align: left; }
+    th { background-color: #343a40; color: white; }
+    .text-end { text-align: right; }
+</style>
+</head>
+<body>
+    <h2>Whispering Willows</h2>
+    <p class="text-center text-muted">Expense Report</p>
+    <hr/>
+    <div>
+        <strong>Period:</strong> {{ start_date|default:'Beginning' }} to {{ end_date|default:'Present' }} <br/>
+        <strong>Total Expenses:</strong> Rs. {{ total_expense }}
+    </div>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Reason</th>
+                <th>Shop/Vendor</th>
+                <th>Bill Number</th>
+                <th class="text-end">Amount (Rs)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for e in expenses %}
+            <tr>
+                <td>{{ e.date }}</td>
+                <td>{{ e.reason }}</td>
+                <td>{{ e.shop_name|default:'-' }}</td>
+                <td>{{ e.bill_number|default:'-' }}</td>
+                <td class="text-end">Rs. {{ e.amount }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

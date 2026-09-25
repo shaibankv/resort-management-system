@@ -1,0 +1,243 @@
+{% extends 'resort/base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0 border-top border-warning border-3 mb-5">
+            <div class="card-header bg-white text-warning pb-0 border-0">
+                <h4 class="mb-2 mt-2">Edit Guest: {{ guest.name }}</h4>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form.non_field_errors }}
+                    
+                    <h6 class="border-bottom pb-2 mb-3 mt-2 text-secondary">Basic Info</h6>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.name.id_for_label }}" class="form-label">Name</label>
+                            {{ form.name }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.phone_number.id_for_label }}" class="form-label">Phone Number</label>
+                            {{ form.phone_number }}
+                        </div>
+                    </div>
+
+                    <h6 class="border-bottom pb-2 mb-3 mt-2 text-secondary">Stay Details</h6>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.number_of_adults.id_for_label }}" class="form-label">Adults</label>
+                            {{ form.number_of_adults }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.number_of_children.id_for_label }}" class="form-label">Children</label>
+                            {{ form.number_of_children }}
+                        </div>
+                    </div>
+
+                    <h6 class="border-bottom pb-2 mb-3 mt-4 text-secondary">Room Details</h6>
+                    <div class="mb-3 d-flex justify-content-between align-items-center">
+                        <div>
+                            <label class="form-label font-weight-bold text-primary mb-0">Rooms Booked</label>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-primary" id="add_room_btn">+ Add Room</button>
+                    </div>
+                    
+                    <div id="rooms_container" class="mb-4">
+                        <!-- Dynamic room rows go here -->
+                    </div>
+
+                    <div class="row bg-light p-3 rounded mb-3">
+                        <div class="col-12 mb-2 form-check form-switch ms-2">
+                            {{ form.extra_bed_needed }}
+                            <label class="form-check-label ms-2" for="{{ form.extra_bed_needed.id_for_label }}">Extra Bed Required?</label>
+                        </div>
+                        <div class="col-md-6" id="extra_bed_rate_container" style="display: none;">
+                            <label for="{{ form.extra_bed_rate.id_for_label }}" class="form-label text-danger">Extra Bed Rate Per Day (₹)</label>
+                            {{ form.extra_bed_rate }}
+                        </div>
+                    </div>
+                    
+                    <h6 class="border-bottom pb-2 mb-3 mt-4 text-secondary">Food Details</h6>
+                    <div class="mb-3 d-flex justify-content-between align-items-center">
+                        <div>
+                            <label class="form-label font-weight-bold text-success mb-0">Food Orders</label>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-success" id="add_food_btn">+ Add Food</button>
+                    </div>
+                    
+                    <div id="food_container" class="mb-4">
+                        <!-- Dynamic food rows go here -->
+                    </div>
+
+                    <h6 class="border-bottom pb-2 mb-3 mt-4 text-secondary">Booking Info</h6>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.mode_of_booking.id_for_label }}" class="form-label">Mode of Booking</label>
+                            {{ form.mode_of_booking }}
+                        </div>
+                        <div class="col-md-6 mb-3" id="booked_by_container" style="display: none;">
+                            <label for="{{ form.booked_by.id_for_label }}" class="form-label">Booked By (Required if Offline)</label>
+                            {{ form.booked_by }}
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 mt-4">
+                        <a href="{% url 'active_guests' %}" class="btn btn-light">Cancel</a>
+                        <button type="submit" class="btn btn-warning px-4 text-white font-weight-bold">Update Guest</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Booked By Toggle
+        var modeSelect = document.getElementById("id_mode_of_booking");
+        var bookedByContainer = document.getElementById("booked_by_container");
+
+        function toggleBookedBy() {
+            if (modeSelect.value === "Offline") {
+                bookedByContainer.style.display = "block";
+            } else {
+                bookedByContainer.style.display = "none";
+            }
+        }
+        modeSelect.addEventListener("change", toggleBookedBy);
+        toggleBookedBy();
+
+        // Extra Bed Toggle
+        var extraBedCheckbox = document.getElementById("id_extra_bed_needed");
+        var extraBedRateContainer = document.getElementById("extra_bed_rate_container");
+
+        function toggleExtraBed() {
+            if (extraBedCheckbox.checked) {
+                extraBedRateContainer.style.display = "block";
+            } else {
+                extraBedRateContainer.style.display = "none";
+            }
+        }
+        extraBedCheckbox.addEventListener("change", toggleExtraBed);
+        toggleExtraBed();
+
+        // Initial Data for Rooms
+        var roomsData = [
+            {% for room in guest.bookedroom_set.all %}
+            {
+                type: "{{ room.room_type|escapejs }}",
+                number: "{{ room.room_number|escapejs }}",
+                rate: "{{ room.rate_per_day|escapejs }}"
+            }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ];
+        
+        // Initial Data for Food
+        var foodData = [
+            {% for food in guest.foodcharge_set.all %}
+            {
+                name: "{{ food.item_name|escapejs }}",
+                qty: "{{ food.quantity|escapejs }}",
+                rate: "{{ food.rate_per_unit|escapejs }}",
+                date: "{{ food.date|date:'Y-m-d'|escapejs }}"
+            }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ];
+
+        var roomsContainer = document.getElementById("rooms_container");
+        var addRoomBtn = document.getElementById("add_room_btn");
+        
+        var foodContainer = document.getElementById("food_container");
+        var addFoodBtn = document.getElementById("add_food_btn");
+
+        function createRoomRow(type, number, rate) {
+            var div = document.createElement("div");
+            div.className = "row g-2 mb-2 align-items-end p-2 border rounded bg-light room-row";
+            div.innerHTML = `
+                <div class="col-md-3">
+                    <label class="form-label small text-muted mb-1">Room Type</label>
+                    <select name="room_type[]" class="form-select form-select-sm" required>
+                        <option value="Standard" ${type==='Standard'?'selected':''}>Standard</option>
+                        <option value="Deluxe" ${type==='Deluxe'?'selected':''}>Deluxe</option>
+                        <option value="Suite" ${type==='Suite'?'selected':''}>Suite</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small text-muted mb-1">Room No.</label>
+                    <input type="text" name="room_number[]" class="form-control form-control-sm" value="${number}" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small text-muted mb-1">Rate (₹)</label>
+                    <input type="number" step="0.01" name="room_rate[]" class="form-control form-control-sm" value="${rate}" required>
+                </div>
+                <div class="col-md-3 text-end">
+                    <button type="button" class="btn btn-sm btn-outline-danger remove-room-btn">Remove</button>
+                </div>
+            `;
+            roomsContainer.appendChild(div);
+            
+            div.querySelector('.remove-room-btn').addEventListener('click', function() {
+                div.remove();
+            });
+        }
+        
+        function createFoodRow(name, qty, rate, date) {
+            var div = document.createElement("div");
+            div.className = "row g-2 mb-2 align-items-end p-2 border rounded bg-light food-row";
+            div.innerHTML = `
+                <div class="col-md-3">
+                    <label class="form-label small text-muted mb-1">Item Name</label>
+                    <input type="text" name="food_item_name[]" class="form-control form-control-sm" value="${name}" required>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small text-muted mb-1">Qty</label>
+                    <input type="number" name="food_quantity[]" class="form-control form-control-sm" value="${qty}" required min="1">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small text-muted mb-1">Rate (₹)</label>
+                    <input type="number" step="0.01" name="food_rate[]" class="form-control form-control-sm" value="${rate}" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small text-muted mb-1">Date</label>
+                    <input type="date" name="food_date[]" class="form-control form-control-sm" value="${date}" required>
+                </div>
+                <div class="col-md-2 text-end">
+                    <button type="button" class="btn btn-sm btn-outline-danger remove-food-btn">Remove</button>
+                </div>
+            `;
+            foodContainer.appendChild(div);
+            
+            div.querySelector('.remove-food-btn').addEventListener('click', function() {
+                div.remove();
+            });
+        }
+
+        // Initialize Rooms
+        if (roomsData.length === 0) {
+            createRoomRow("Standard", "", "");
+        } else {
+            roomsData.forEach(function(room) {
+                createRoomRow(room.type, room.number, room.rate);
+            });
+        }
+        
+        // Initialize Food
+        foodData.forEach(function(food) {
+            createFoodRow(food.name, food.qty, food.rate, food.date);
+        });
+
+        addRoomBtn.addEventListener("click", function() {
+            createRoomRow("Standard", "", "");
+        });
+        
+        addFoodBtn.addEventListener("click", function() {
+            var today = new Date().toISOString().split('T')[0];
+            createFoodRow("", "1", "", today);
+        });
+    });
+</script>
+{% endblock %}

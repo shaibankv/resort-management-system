@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Whispering Willows</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        .login-card {
+            width: 100%;
+            max-width: 400px;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card login-card">
+        <div class="text-center mb-4">
+            <h2 class="text-success">🌿 Whispering Willows</h2>
+            <p class="text-muted">Manager Login</p>
+        </div>
+        
+        <form method="post">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                <div style="background-color: red; color: white; padding: 10px; border-radius: 5px; margin-bottom: 15px; text-align: center;">
+                    {{ form.non_field_errors.0 }}
+                </div>
+            {% endif %}
+            <div class="mb-3">
+                <label for="{{ form.username.id_for_label }}" class="form-label">Username</label>
+                <input type="text" name="{{ form.username.html_name }}" class="form-control" id="{{ form.username.id_for_label }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="{{ form.password.id_for_label }}" class="form-label">Password</label>
+                <input type="password" name="{{ form.password.html_name }}" class="form-control" id="{{ form.password.id_for_label }}" required>
+            </div>
+            <div class="d-grid">
+                <button type="submit" class="btn btn-success btn-block">Login</button>
+            </div>
+        </form>
+    </div>
+
+</body>
+</html>

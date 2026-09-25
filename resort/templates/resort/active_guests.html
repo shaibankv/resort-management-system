@@ -1,0 +1,50 @@
+{% extends 'resort/base.html' %}
+
+{% block content %}
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h4 class="mb-0">Active Guests</h4>
+        <a href="{% url 'add_guest' %}" class="btn btn-light btn-sm">Add New Guest</a>
+    </div>
+    <div class="card-body">
+        {% if guests %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Name</th>
+                            <th>Phone</th>
+                            <th>Mode</th>
+                            <th>Check-in Date</th>
+                            <th>Room Rate</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for guest in guests %}
+                        <tr>
+                            <td>{{ guest.name }}</td>
+                            <td>{{ guest.phone_number }}</td>
+                            <td>
+                                <span class="badge {% if guest.mode_of_booking == 'Online' %}bg-info{% else %}bg-secondary{% endif %}">
+                                    {{ guest.mode_of_booking }}
+                                </span>
+                            </td>
+                            <td>{{ guest.check_in_date }}</td>
+                            <td>₹{{ guest.daily_room_rate }} / day</td>
+                            <td>
+                                <a href="{% url 'edit_guest' guest.id %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                                <a href="{% url 'add_food' guest.id %}" class="btn btn-sm btn-outline-primary">Add Food</a>
+                                <a href="{% url 'checkout' guest.id %}" class="btn btn-sm btn-outline-danger">Checkout</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="text-muted mb-0">No active guests at the moment.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

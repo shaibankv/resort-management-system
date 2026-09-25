@@ -1,0 +1,45 @@
+{% extends 'resort/base.html' %}
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <h2 class="mb-4">Add New Expense</h2>
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label>Date</label>
+                            {{ form.date }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label>Amount (₹)</label>
+                            {{ form.amount }}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label>Reason / Description</label>
+                        {{ form.reason }}
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label>Shop Name / Vendor (Optional)</label>
+                            {{ form.shop_name }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label>Bill / Invoice Number (Optional)</label>
+                            {{ form.bill_number }}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label>Upload Bill Photo (Image or PDF)</label>
+                        {{ form.bill_photo }}
+                    </div>
+                    <button type="submit" class="btn btn-success">Save Expense</button>
+                    <a href="{% url 'manage_expenses' %}" class="btn btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

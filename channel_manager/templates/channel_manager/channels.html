@@ -1,0 +1,58 @@
+{% extends 'resort/base.html' %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2>OTA Channels</h2>
+        <p class="text-muted">Manage connections to external booking channels.</p>
+    </div>
+</div>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+{% endif %}
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Channel Name</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for channel in channels %}
+                <tr>
+                    <td><strong>{{ channel.name }}</strong></td>
+                    <td>
+                        {% if channel.is_active %}
+                            <span class="badge bg-success">Connected</span>
+                        {% else %}
+                            <span class="badge bg-secondary">Not Connected</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <form action="{% url 'channel_manager:toggle_channel' channel.id %}" method="post">
+                            {% csrf_token %}
+                            {% if channel.is_active %}
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Disconnect</button>
+                            {% else %}
+                                <button type="submit" class="btn btn-sm btn-success">Connect</button>
+                            {% endif %}
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" class="text-center">No channels configured in database.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

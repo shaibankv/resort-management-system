@@ -1,0 +1,183 @@
+{% extends 'resort/base.html' %}
+
+{% block content %}
+<div class="card shadow-sm mb-4 border-0">
+    <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center py-3">
+        <h4 class="mb-0">Visited Guests (History & Reports)</h4>
+        <div>
+            <button class="btn btn-light btn-sm d-print-none" onclick="window.print()">
+                <i class="bi bi-printer"></i> Print Report
+            </button>
+            <button type="submit" form="filterForm" name="export" value="email" class="btn btn-info btn-sm d-print-none text-white ms-2">
+                <i class="bi bi-envelope"></i> Email Report
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        
+        <!-- Filter Form -->
+        <form id="filterForm" method="get" class="row g-3 mb-4 p-3 bg-light rounded border d-print-none">
+            <div class="col-md-2">
+                <label for="start_date" class="form-label font-weight-bold">Start Date</label>
+                <input type="date" name="start_date" id="start_date" class="form-control" value="{{ start_date|default_if_none:'' }}">
+            </div>
+            <div class="col-md-2">
+                <label for="end_date" class="form-label font-weight-bold">End Date</label>
+                <input type="date" name="end_date" id="end_date" class="form-control" value="{{ end_date|default_if_none:'' }}">
+            </div>
+            <div class="col-md-2">
+                <label for="mode" class="form-label font-weight-bold">Booking Mode</label>
+                <select name="mode" id="mode" class="form-select">
+                    <option value="">All Modes</option>
+                    <option value="Online" {% if mode == 'Online' %}selected{% endif %}>Online</option>
+                    <option value="Offline" {% if mode == 'Offline' %}selected{% endif %}>Offline</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="revenue_type" class="form-label font-weight-bold">Revenue Type</label>
+                <select name="revenue_type" id="revenue_type" class="form-select">
+                    <option value="all" {% if revenue_type == 'all' %}selected{% endif %}>All Total</option>
+                    <option value="room" {% if revenue_type == 'room' %}selected{% endif %}>Room Revenue Only</option>
+                    <option value="food" {% if revenue_type == 'food' %}selected{% endif %}>Food Revenue Only</option>
+                </select>
+            </div>
+            <div class="col-md-3 d-flex align-items-end gap-2">
+                <button type="submit" class="btn btn-primary w-100">Apply</button>
+                <a href="{% url 'visited_guests' %}" class="btn btn-outline-secondary">Clear</a>
+            </div>
+        </form>
+
+        <!-- Report Header for Print -->
+        <div class="d-none d-print-block mb-4 text-center">
+            <h2>Whispering Willows Resort</h2>
+            <h4>Visited Guests Report</h4>
+            {% if start_date or end_date %}
+            <p>Period: {{ start_date|default:'Beginning' }} to {{ end_date|default:'Present' }}</p>
+            {% endif %}
+        </div>
+
+        <!-- Results Table -->
+        {% if guests %}
+            <div class="table-responsive">
+                <table class="table table-hover table-bordered align-middle" id="report-table">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Guest Name</th>
+                            <th>Phone</th>
+                            <th>Guests</th>
+                            <th>Mode</th>
+                            <th>Check-in</th>
+                            <th>Check-out</th>
+                            {% if revenue_type == 'all' or revenue_type == 'room' %}
+                            <th class="text-end">Room Bill</th>
+                            {% endif %}
+                            {% if revenue_type == 'all' or revenue_type == 'food' %}
+                            <th class="text-end">Food Bill</th>
+                            {% endif %}
+                            {% if revenue_type == 'all' %}
+                            <th class="text-end">Total Bill</th>
+                            {% endif %}
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for guest in guests %}
+                        <tr>
+                            <td>{{ guest.name }}</td>
+                            <td>{{ guest.phone_number }}</td>
+                            <td>{{ guest.number_of_adults }}A, {{ guest.number_of_children }}C</td>
+                            <td>
+                                <span class="badge {% if guest.mode_of_booking == 'Online' %}bg-info{% else %}bg-secondary{% endif %}">
+                                    {{ guest.mode_of_booking }}
+                                </span>
+                                {% if guest.mode_of_booking == 'Offline' and guest.booked_by %}
+                                <div class="small text-muted mt-1" style="font-size: 0.75rem;">By: {{ guest.booked_by }}</div>
+                                {% endif %}
+                            </td>
+                            <td>{{ guest.check_in_date|date:"Y-m-d" }}</td>
+                            <td>{{ guest.check_out_date|date:"Y-m-d" }}</td>
+                            {% if revenue_type == 'all' or revenue_type == 'room' %}
+                            <td class="text-end">₹{{ guest.total_room_bill }}</td>
+                            {% endif %}
+                            {% if revenue_type == 'all' or revenue_type == 'food' %}
+                            <td class="text-end">₹{{ guest.total_food_bill }}</td>
+                            {% endif %}
+                            {% if revenue_type == 'all' %}
+                            <td class="text-end fw-bold text-success">₹{{ guest.total_bill }}</td>
+                            {% endif %}
+                            <td class="text-center">
+                                <a href="{% url 'view_bill' guest.id %}" class="btn btn-sm btn-outline-info d-print-none">View Bill</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot class="table-dark">
+                        <tr>
+                            <th colspan="6" class="text-end fs-5">Totals for Selected Period:</th>
+                            {% if revenue_type == 'all' or revenue_type == 'room' %}
+                            <th class="text-end text-warning">₹{{ total_room_revenue }}</th>
+                            {% endif %}
+                            {% if revenue_type == 'all' or revenue_type == 'food' %}
+                            <th class="text-end text-warning">₹{{ total_food_revenue }}</th>
+                            {% endif %}
+                            {% if revenue_type == 'all' %}
+                            <th class="text-end text-success fs-5">₹{{ total_revenue }}</th>
+                            {% endif %}
+                            <th></th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-info text-center">
+                No visited guests match the selected criteria.
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    /* CSS for A4 Size and Narrow Margins when Printing */
+    @page {
+        size: A4 portrait;
+        margin: 10mm;
+    }
+    
+    @media print {
+        body {
+            background-color: white;
+            font-size: 9pt; /* Reduced font size to fit portrait */
+        }
+        body * {
+            visibility: hidden;
+        }
+        .card-header, .d-print-none {
+            display: none !important;
+        }
+        #report-table, #report-table *, .d-print-block, .d-print-block * {
+            visibility: visible;
+        }
+        .d-print-block {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+        }
+        #report-table {
+            position: absolute;
+            left: 0;
+            top: 100px;
+            width: 100%;
+            table-layout: auto;
+        }
+        /* Reduce padding inside table to compress it horizontally */
+        #report-table th, #report-table td {
+            padding: 4px !important;
+        }
+        .table-dark th {
+            color: black !important;
+            background-color: #f8f9fa !important;
+        }
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends 'resort/base.html' %}
+
+{% block content %}
+<div class="row mb-4 align-items-center">
+    <div class="col-md-8">
+        <h2 class="text-success mb-0">Manager Dashboard</h2>
+        <p class="text-muted mb-0">Welcome to Whispering Willows overview</p>
+    </div>
+    <div class="col-md-4 text-md-end mt-3 mt-md-0">
+        <div class="badge bg-light text-dark fs-6 py-2 px-3 border shadow-sm">
+            <i class="bi bi-calendar3 me-2"></i>{% now "l, j F Y" %}
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <!-- Active Guests Card -->
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 border-start border-primary border-5 h-100">
+            <div class="card-body">
+                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Active Guests</div>
+                <div class="h2 mb-0 font-weight-bold text-gray-800">{{ active_guests_count }}</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Guests This Month Card -->
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 border-start border-info border-5 h-100">
+            <div class="card-body">
+                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Guests Checked Out (This Month)</div>
+                <div class="h2 mb-0 font-weight-bold text-gray-800">{{ guests_this_month }}</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Revenue This Month Card -->
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 border-start border-success border-5 h-100">
+            <div class="card-body">
+                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Total Revenue (This Month)</div>
+                <div class="h2 mb-0 font-weight-bold text-gray-800">₹{{ revenue_this_month }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white font-weight-bold">Quick Actions</div>
+            <div class="card-body d-grid gap-3">
+                <a href="{% url 'add_guest' %}" class="btn btn-outline-primary btn-lg">Add New Guest</a>
+                <a href="{% url 'active_guests' %}" class="btn btn-outline-info btn-lg">View Active Guests</a>
+                <a href="{% url 'visited_guests' %}" class="btn btn-outline-secondary btn-lg">View History / Reports</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .border-start { border-left-width: .25rem !important; }
+</style>
+{% endblock %}

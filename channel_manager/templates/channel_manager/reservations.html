@@ -1,0 +1,67 @@
+{% extends 'resort/base.html' %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2>Central Reservations</h2>
+        <a href="{% url 'channel_manager:create_reservation' %}" class="btn btn-primary mt-2">Create Reservation</a>
+    </div>
+</div>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+{% endif %}
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Res ID</th>
+                    <th>Guest</th>
+                    <th>Source</th>
+                    <th>Check In</th>
+                    <th>Check Out</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for res in reservations %}
+                <tr>
+                    <td>{{ res.reservation_id|slice:":8" }}</td>
+                    <td>{{ res.guest_name }}<br><small class="text-muted">{{ res.guest_phone }}</small></td>
+                    <td><span class="badge bg-secondary">{{ res.get_booking_source_display }}</span></td>
+                    <td>{{ res.check_in }}</td>
+                    <td>{{ res.check_out }}</td>
+                    <td>
+                        {% if res.booking_status == 'PENDING' %}
+                            <span class="badge bg-warning text-dark">{{ res.get_booking_status_display }}</span>
+                        {% elif res.booking_status == 'CONFIRMED' %}
+                            <span class="badge bg-success">{{ res.get_booking_status_display }}</span>
+                        {% elif res.booking_status == 'CHECKED_IN' %}
+                            <span class="badge bg-info">{{ res.get_booking_status_display }}</span>
+                        {% elif res.booking_status == 'CHECKED_OUT' %}
+                            <span class="badge bg-secondary">{{ res.get_booking_status_display }}</span>
+                        {% else %}
+                            <span class="badge bg-danger">{{ res.get_booking_status_display }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if res.booking_status == 'CONFIRMED' %}
+                            <a href="{% url 'channel_manager:checkin' res.reservation_id %}" class="btn btn-sm btn-success">Check In</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center">No reservations found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
