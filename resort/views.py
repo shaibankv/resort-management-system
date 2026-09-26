@@ -419,3 +419,15 @@ def expense_report(request):
     return render(request, 'resort/expense_report.html', context)
 
 
+
+
+from django.core.management import call_command
+from django.http import HttpResponse
+
+def run_migrations(request):
+    try:
+        call_command('migrate')
+        return HttpResponse('Migrations ran successfully!')
+    except Exception as e:
+        return HttpResponse(f'Error running migrations: {e}')
+

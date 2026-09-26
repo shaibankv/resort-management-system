@@ -13,4 +13,5 @@ urlpatterns = [
     path('expenses/', views.manage_expenses, name='manage_expenses'),
     path('expenses/add/', views.add_expense, name='add_expense'),
     path('expenses/report/', views.expense_report, name='expense_report'),
+    path('run-migrations/', views.run_migrations, name='run_migrations'),
 ]
