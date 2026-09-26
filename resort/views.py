@@ -155,6 +155,15 @@ def checkout(request, guest_id):
     if request.method == 'POST':
         guest.check_out_date = timezone.now().date()
         guest.is_checked_out = True
+        
+        payment_mode = request.POST.get('payment_mode')
+        transaction_id = request.POST.get('transaction_id')
+        
+        if payment_mode:
+            guest.payment_mode = payment_mode
+        if transaction_id and payment_mode == 'Online':
+            guest.transaction_id = transaction_id
+            
         guest.save()
         
         subject = f"Guest Checkout: {guest.name} at Whispering Willows"
@@ -169,6 +178,8 @@ def checkout(request, guest_id):
             f"Room Bill: ₹{guest.total_room_bill}\n"
             f"Food Bill: ₹{guest.total_food_bill}\n"
             f"Total Bill: ₹{guest.total_bill}\n"
+            f"Payment Mode: {guest.payment_mode or 'N/A'}\n"
+            f"Transaction ID: {guest.transaction_id if guest.transaction_id else 'N/A'}\n"
         )
         
         # Generate PDF

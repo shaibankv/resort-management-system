@@ -32,9 +32,24 @@
                     <strong>₹{{ guest.total_bill }}</strong>
                 </div>
                 
-                <form method="post">
+                <form method="post" id="checkout-form">
                     {% csrf_token %}
-                    <div class="d-grid gap-2">
+                    <div class="mb-3">
+                        <label for="payment_mode" class="form-label">Payment Mode</label>
+                        <select name="payment_mode" id="payment_mode" class="form-select" required>
+                            <option value="" disabled selected>Select Payment Mode</option>
+                            <option value="Cash">Cash</option>
+                            <option value="Card">Card</option>
+                            <option value="Online">Online/UPI</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3" id="transaction_id_div" style="display: none;">
+                        <label for="transaction_id" class="form-label">Transaction ID</label>
+                        <input type="text" name="transaction_id" id="transaction_id" class="form-control" placeholder="Enter Transaction ID">
+                    </div>
+
+                    <div class="d-grid gap-2 mt-4">
                         <button type="submit" class="btn btn-danger btn-lg">Confirm Checkout & Generate Bill</button>
                         <a href="{% url 'active_guests' %}" class="btn btn-outline-secondary">Cancel</a>
                     </div>
@@ -46,4 +61,23 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var paymentModeSelect = document.getElementById('payment_mode');
+        var trIdDiv = document.getElementById('transaction_id_div');
+        var trIdInput = document.getElementById('transaction_id');
+
+        paymentModeSelect.addEventListener('change', function() {
+            if (this.value === 'Online') {
+                trIdDiv.style.display = 'block';
+                trIdInput.required = true;
+            } else {
+                trIdDiv.style.display = 'none';
+                trIdInput.required = false;
+                trIdInput.value = '';
+            }
+        });
+    });
+</script>
 {% endblock %}

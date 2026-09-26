@@ -26,7 +26,11 @@
         <strong>Phone:</strong> {{ guest.phone_number }} <br/>
         <strong>Check-in:</strong> {{ guest.check_in_date }} <br/>
         <strong>Check-out:</strong> {{ guest.check_out_date }} <br/>
-        <strong>Guests:</strong> {{ guest.number_of_adults }} Adults, {{ guest.number_of_children }} Children
+        <strong>Guests:</strong> {{ guest.number_of_adults }} Adults, {{ guest.number_of_children }} Children <br/>
+        <strong>Payment Mode:</strong> {{ guest.payment_mode|default:"N/A" }} <br/>
+        {% if guest.payment_mode == 'Online' and guest.transaction_id %}
+        <strong>Transaction ID:</strong> {{ guest.transaction_id }}
+        {% endif %}
     </div>
     
     <table>

@@ -24,6 +24,10 @@
                         <div class="text-dark"><strong>Check-in:</strong> {{ guest.check_in_date }}</div>
                         <div class="text-dark"><strong>Check-out:</strong> {{ guest.check_out_date }}</div>
                         <div class="text-dark"><strong>Booking Mode:</strong> {{ guest.mode_of_booking }}</div>
+                        <div class="text-dark"><strong>Payment Mode:</strong> {{ guest.payment_mode|default:"N/A" }}</div>
+                        {% if guest.payment_mode == 'Online' and guest.transaction_id %}
+                        <div class="text-dark"><strong>Transaction ID:</strong> {{ guest.transaction_id }}</div>
+                        {% endif %}
                     </div>
                 </div>
 

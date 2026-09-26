@@ -21,6 +21,14 @@ class Guest(models.Model):
     check_in_date = models.DateField(default=timezone.now)
     check_out_date = models.DateField(blank=True, null=True)
     is_checked_out = models.BooleanField(default=False)
+    
+    PAYMENT_MODE_CHOICES = (
+        ('Cash', 'Cash'),
+        ('Card', 'Card'),
+        ('Online', 'Online'),
+    )
+    payment_mode = models.CharField(max_length=20, choices=PAYMENT_MODE_CHOICES, blank=True, null=True)
+    transaction_id = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):
         return f"{self.name} - {self.phone_number}"
